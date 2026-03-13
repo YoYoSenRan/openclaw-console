@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router";
-import { DashboardLayout } from "@/layouts/DashboardLayout";
+import { DashboardLayout } from "@/layouts/dashboard-layout";
 import LoginPage from "@/pages/login/LoginPage";
 import DashboardPage from "@/pages/dashboard/DashboardPage";
 import AgentsPage from "@/pages/agents/AgentsPage";

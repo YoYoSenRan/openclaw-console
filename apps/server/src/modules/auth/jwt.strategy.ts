@@ -2,16 +2,20 @@ import { Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { ConfigService } from "@nestjs/config";
+import { PrismaService } from "../../prisma/prisma.service";
+import { BizException } from "../../common/exceptions/biz.exception";
+import { BizCode } from "../../common/constants/codes";
 
 interface JwtPayload {
-  sub: string;
-  email: string;
-  role: string;
+  gatewayId: string;
 }
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(configService: ConfigService) {
+  constructor(
+    configService: ConfigService,
+    private prisma: PrismaService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -19,7 +23,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: JwtPayload) {
-    return { id: payload.sub, email: payload.email, role: payload.role };
+  async validate(payload: JwtPayload) {
+    const gateway = await this.prisma.gateway.findUnique({
+      where: { id: payload.gatewayId },
+    });
+
+    if (!gateway) {
+      throw new BizException(BizCode.GATEWAY_NOT_CONFIGURED, "Gateway 未配置或已断开");
+    }
+
+    return { gatewayId: payload.gatewayId };
   }
 }

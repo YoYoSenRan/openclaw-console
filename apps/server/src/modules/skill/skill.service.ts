@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { CreateSkillDto } from "./dto/create-skill.dto";
-import { UpdateSkillDto } from "./dto/update-skill.dto";
+import { CreateSkillDto } from "./dto/create.dto";
+import { UpdateSkillDto } from "./dto/update.dto";
 
 @Injectable()
 export class SkillService {

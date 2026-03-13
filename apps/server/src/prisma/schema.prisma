@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ADMIN
-  USER
-}
-
 enum AgentStatus {
   ACTIVE
   INACTIVE
@@ -28,20 +23,6 @@ enum GatewayStatus {
   CONNECTED
   DISCONNECTED
   ERROR
-}
-
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      UserRole @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  sessions Session[]
-
-  @@map("users")
 }
 
 model Agent {
@@ -61,14 +42,12 @@ model Agent {
 model Session {
   id        String        @id @default(uuid())
   agentId   String
-  userId    String
   status    SessionStatus @default(ACTIVE)
   metadata  Json          @default("{}")
   startedAt DateTime      @default(now())
   endedAt   DateTime?
 
   agent Agent @relation(fields: [agentId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
 
   @@map("sessions")
 }
@@ -90,6 +69,8 @@ model Gateway {
   id            String        @id @default(uuid())
   name          String
   endpoint      String
+  authType      String
+  credential    String
   status        GatewayStatus @default(DISCONNECTED)
   lastHeartbeat DateTime?
   config        Json          @default("{}")

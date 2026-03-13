@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
+import { JwtAuthGuard } from "../../common/guards/auth.guard";
 import { SkillService } from "./skill.service";
-import { CreateSkillDto } from "./dto/create-skill.dto";
-import { UpdateSkillDto } from "./dto/update-skill.dto";
+import { CreateSkillDto } from "./dto/create.dto";
+import { UpdateSkillDto } from "./dto/update.dto";
 
 @Controller("skills")
 @UseGuards(JwtAuthGuard)

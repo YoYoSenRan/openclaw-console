@@ -7,7 +7,6 @@ const envSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
   JWT_SECRET: z.string(),
-  JWT_REFRESH_SECRET: z.string(),
   SERVER_PORT: z.coerce.number().default(3000),
   CORS_ORIGIN: z.string().optional(),
 });

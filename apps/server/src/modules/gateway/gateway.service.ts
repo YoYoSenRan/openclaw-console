@@ -1,33 +1,63 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { CreateGatewayDto } from "./dto/create-gateway.dto";
-import { UpdateGatewayDto } from "./dto/update-gateway.dto";
+import { BizException } from "../../common/exceptions/biz.exception";
+import { BizCode } from "../../common/constants/codes";
 
 @Injectable()
-export class GatewayService {
+export class GatewayService implements OnModuleInit {
+  private readonly logger = new Logger(GatewayService.name);
+  private activeGatewayIds = new Set<string>();
+
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.gateway.findMany({ orderBy: { createdAt: "desc" } });
+  async onModuleInit() {
+    // 启动时检查已保存的 Gateway 配置，尝试自动连接
+    const gateways = await this.prisma.gateway.findMany();
+    for (const gw of gateways) {
+      try {
+        await this.testConnection(gw.endpoint, gw.authType, gw.credential);
+        this.activeGatewayIds.add(gw.id);
+        await this.prisma.gateway.update({
+          where: { id: gw.id },
+          data: { status: "CONNECTED", lastHeartbeat: new Date() },
+        });
+        this.logger.log(`Gateway "${gw.name}" 自动连接成功`);
+      } catch {
+        await this.prisma.gateway.update({
+          where: { id: gw.id },
+          data: { status: "DISCONNECTED" },
+        });
+        this.logger.warn(`Gateway "${gw.name}" 自动连接失败`);
+      }
+    }
   }
 
-  async findById(id: string) {
-    const gateway = await this.prisma.gateway.findUnique({ where: { id } });
-    if (!gateway) throw new NotFoundException("Gateway not found");
-    return gateway;
+  async testConnection(_endpoint: string, _authType: string, _credential: string): Promise<void> {
+    // TODO: 实际调用 Gateway 健康检查端点验证连接
+    // 当前为占位实现，直接通过
+    // 未来应发送 HTTP 请求到 endpoint 验证 authType + credential
   }
 
-  async create(dto: CreateGatewayDto) {
-    return this.prisma.gateway.create({ data: dto as any });
+  async getStatus(gatewayId: string) {
+    const gateway = await this.prisma.gateway.findUnique({ where: { id: gatewayId } });
+    if (!gateway) {
+      throw new BizException(BizCode.GATEWAY_NOT_CONFIGURED, "Gateway 未配置");
+    }
+
+    return {
+      id: gateway.id,
+      name: gateway.name,
+      endpoint: gateway.endpoint,
+      status: gateway.status,
+      lastHeartbeat: gateway.lastHeartbeat,
+    };
   }
 
-  async update(id: string, dto: UpdateGatewayDto) {
-    await this.findById(id);
-    return this.prisma.gateway.update({ where: { id }, data: dto as any });
+  onConnected(gatewayId: string) {
+    this.activeGatewayIds.add(gatewayId);
   }
 
-  async delete(id: string) {
-    await this.findById(id);
-    return this.prisma.gateway.delete({ where: { id } });
+  onDisconnected(gatewayId: string) {
+    this.activeGatewayIds.delete(gatewayId);
   }
 }

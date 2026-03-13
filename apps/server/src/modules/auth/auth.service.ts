@@ -1,71 +1,74 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
-import * as bcrypt from "bcrypt";
 import { PrismaService } from "../../prisma/prisma.service";
+import { GatewayService } from "../gateway/gateway.service";
+import { ConnectGatewayDto } from "./dto/connect.dto";
+import { BizException } from "../../common/exceptions/biz.exception";
+import { BizCode } from "../../common/constants/codes";
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private gatewayService: GatewayService,
   ) {}
 
-  async login(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      throw new UnauthorizedException("Invalid credentials");
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException("Invalid credentials");
-    }
-
-    const payload = { sub: user.id, email: user.email, role: user.role };
-
-    return {
-      accessToken: this.jwtService.sign(payload),
-      refreshToken: this.jwtService.sign(payload, {
-        secret: this.configService.get("JWT_REFRESH_SECRET", "default-refresh-secret"),
-        expiresIn: this.configService.get("JWT_REFRESH_EXPIRES_IN", "7d"),
-      }),
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        createdAt: user.createdAt.toISOString(),
-      },
-    };
+  async getStatus() {
+    const gateway = await this.prisma.gateway.findFirst();
+    return { connected: !!gateway, gatewayId: gateway?.id ?? null };
   }
 
-  async refresh(refreshToken: string) {
-    try {
-      const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get("JWT_REFRESH_SECRET", "default-refresh-secret"),
-      });
+  async connect(dto: ConnectGatewayDto) {
+    // 验证 Gateway 连接
+    await this.gatewayService.testConnection(dto.endpoint, dto.authType, dto.credential);
 
-      const user = await this.prisma.user.findUnique({
-        where: { id: payload.sub },
-      });
+    // 清除现有 Gateway 配置（单实例模式）
+    await this.prisma.gateway.deleteMany();
 
-      if (!user) {
-        throw new UnauthorizedException("User not found");
-      }
+    // 保存新的 Gateway 配置
+    const gateway = await this.prisma.gateway.create({
+      data: {
+        name: dto.name,
+        endpoint: dto.endpoint,
+        authType: dto.authType,
+        credential: dto.credential,
+        status: "CONNECTED",
+        lastHeartbeat: new Date(),
+      },
+    });
 
-      const newPayload = { sub: user.id, email: user.email, role: user.role };
+    // 通知 GatewayService 建立连接
+    this.gatewayService.onConnected(gateway.id);
 
-      return {
-        accessToken: this.jwtService.sign(newPayload),
-        refreshToken: this.jwtService.sign(newPayload, {
-          secret: this.configService.get("JWT_REFRESH_SECRET", "default-refresh-secret"),
-          expiresIn: this.configService.get("JWT_REFRESH_EXPIRES_IN", "7d"),
-        }),
-      };
-    } catch {
-      throw new UnauthorizedException("Invalid refresh token");
+    const accessToken = this.signToken(gateway.id);
+
+    return { accessToken, gatewayId: gateway.id };
+  }
+
+  async disconnect(gatewayId: string) {
+    const gateway = await this.prisma.gateway.findUnique({ where: { id: gatewayId } });
+    if (!gateway) {
+      throw new BizException(BizCode.GATEWAY_NOT_CONFIGURED, "Gateway 未配置");
     }
+
+    this.gatewayService.onDisconnected(gatewayId);
+    await this.prisma.gateway.delete({ where: { id: gatewayId } });
+
+    return { disconnected: true };
+  }
+
+  async refresh(gatewayId: string) {
+    const gateway = await this.prisma.gateway.findUnique({ where: { id: gatewayId } });
+    if (!gateway) {
+      throw new BizException(BizCode.GATEWAY_NOT_CONFIGURED, "Gateway 未配置");
+    }
+
+    const accessToken = this.signToken(gateway.id);
+    return { accessToken };
+  }
+
+  private signToken(gatewayId: string): string {
+    return this.jwtService.sign({ gatewayId }, { expiresIn: "24h" });
   }
 }

@@ -1,8 +1,7 @@
 import { Controller, Get, Post, Param, Body, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
-import { CurrentUser } from "../../common/decorators/current-user.decorator";
+import { JwtAuthGuard } from "../../common/guards/auth.guard";
 import { SessionService } from "./session.service";
-import { CreateSessionDto } from "./dto/create-session.dto";
+import { CreateSessionDto } from "./dto/create.dto";
 
 @Controller("sessions")
 @UseGuards(JwtAuthGuard)
@@ -20,7 +19,7 @@ export class SessionController {
   }
 
   @Post()
-  create(@CurrentUser("id") userId: string, @Body() dto: CreateSessionDto) {
-    return this.sessionService.create(userId, dto);
+  create(@Body() dto: CreateSessionDto) {
+    return this.sessionService.create(dto);
   }
 }

@@ -2,6 +2,8 @@ import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
+import { TransformInterceptor } from "./common/interceptors/response.interceptor";
+import { GlobalExceptionFilter } from "./common/filters/exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +22,9 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle("OpenClaw Console API")

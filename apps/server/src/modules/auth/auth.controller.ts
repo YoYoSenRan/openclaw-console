@@ -1,19 +1,31 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import { Controller, Get, Post, Body, UseGuards, Request } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { LoginDto } from "./dto/login.dto";
-import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { ConnectGatewayDto } from "./dto/connect.dto";
+import { JwtAuthGuard } from "../../common/guards/auth.guard";
 
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post("login")
-  async login(@Body() dto: LoginDto) {
-    return this.authService.login(dto.email, dto.password);
+  @Get("status")
+  async status() {
+    return this.authService.getStatus();
+  }
+
+  @Post("connect")
+  async connect(@Body() dto: ConnectGatewayDto) {
+    return this.authService.connect(dto);
+  }
+
+  @Post("disconnect")
+  @UseGuards(JwtAuthGuard)
+  async disconnect(@Request() req: { user: { gatewayId: string } }) {
+    return this.authService.disconnect(req.user.gatewayId);
   }
 
   @Post("refresh")
-  async refresh(@Body() dto: RefreshTokenDto) {
-    return this.authService.refresh(dto.refreshToken);
+  @UseGuards(JwtAuthGuard)
+  async refresh(@Request() req: { user: { gatewayId: string } }) {
+    return this.authService.refresh(req.user.gatewayId);
   }
 }
