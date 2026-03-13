@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum AgentStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  FAILED
+}
+
+enum GatewayStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Agent {
+  id          String      @id @default(uuid())
+  name        String
+  description String      @default("")
+  status      AgentStatus @default(ACTIVE)
+  config      Json        @default("{}")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  sessions Session[]
+
+  @@map("agents")
+}
+
+model Session {
+  id        String        @id @default(uuid())
+  agentId   String
+  userId    String
+  status    SessionStatus @default(ACTIVE)
+  metadata  Json          @default("{}")
+  startedAt DateTime      @default(now())
+  endedAt   DateTime?
+
+  agent Agent @relation(fields: [agentId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@map("sessions")
+}
+
+model Skill {
+  id          String   @id @default(uuid())
+  name        String
+  description String   @default("")
+  version     String
+  enabled     Boolean  @default(true)
+  config      Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("skills")
+}
+
+model Gateway {
+  id            String        @id @default(uuid())
+  name          String
+  endpoint      String
+  status        GatewayStatus @default(DISCONNECTED)
+  lastHeartbeat DateTime?
+  config        Json          @default("{}")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("gateways")
+}

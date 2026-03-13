@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "import", "unicorn", "jsx-a11y"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "eqeqeq": "error",
+    "react/react-in-jsx-scope": "off",
+    "import/no-unassigned-import": "off",
+    "typescript/no-extraneous-class": "off"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "no-unused-vars": "off",
+        "typescript/no-unused-vars": "warn"
+      }
+    }
+  ]
+}

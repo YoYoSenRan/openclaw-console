@@ -1,0 +1,52 @@
+{
+  "name": "openclaw-console",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @openclaw/web dev & pnpm --filter @openclaw/server dev",
+    "dev:web": "pnpm --filter @openclaw/web dev",
+    "dev:server": "pnpm --filter @openclaw/server dev",
+    "build": "pnpm --filter @openclaw/shared build && pnpm --filter @openclaw/web build && pnpm --filter @openclaw/server build",
+    "build:web": "pnpm --filter @openclaw/web build",
+    "build:server": "pnpm --filter @openclaw/server build",
+    "lint": "pnpm -r lint",
+    "lint:fix": "pnpm -r lint:fix",
+    "test": "pnpm -r test",
+    "fmt": "oxfmt --write",
+    "fmt:check": "oxfmt --check",
+    "db:push": "pnpm --filter @openclaw/server db:push",
+    "db:studio": "pnpm --filter @openclaw/server db:studio",
+    "db:generate": "pnpm --filter @openclaw/server db:generate",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.3",
+    "oxfmt": "^0.40.0",
+    "oxlint": "^1.52.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "oxfmt --write",
+      "oxlint"
+    ],
+    "*.{json,md,css}": [
+      "oxfmt --write"
+    ]
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "@swc/core",
+      "bcrypt",
+      "esbuild",
+      "prisma"
+    ]
+  }
+}

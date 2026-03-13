@@ -1,0 +1,53 @@
+{
+  "name": "@openclaw/server",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "nest start",
+    "start:prod": "node dist/main",
+    "lint": "oxlint src/ && tsc --noEmit",
+    "lint:fix": "oxlint --fix src/",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "db:push": "./prisma-env.sh prisma db push --schema=src/prisma/schema.prisma",
+    "db:studio": "./prisma-env.sh prisma studio --schema=src/prisma/schema.prisma",
+    "db:generate": "./prisma-env.sh prisma generate --schema=src/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/passport": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/swagger": "^11.2.6",
+    "@nestjs/terminus": "^11.1.1",
+    "@nestjs/throttler": "^6.5.0",
+    "@openclaw/shared": "workspace:*",
+    "@prisma/client": "^6.4.0",
+    "bcrypt": "^5.1.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "reflect-metadata": "^0.2.0",
+    "rxjs": "^7.8.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@swc/core": "^1.15.18",
+    "@types/bcrypt": "^5.0.0",
+    "@types/express": "^5.0.0",
+    "@types/passport-jwt": "^4.0.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "prisma": "^6.4.0",
+    "typescript": "^5.7.0",
+    "unplugin-swc": "^1.5.9",
+    "vitest": "^4.1.0"
+  }
+}
