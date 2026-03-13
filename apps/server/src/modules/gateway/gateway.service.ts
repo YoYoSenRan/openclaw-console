@@ -73,7 +73,7 @@ export class GatewayService implements OnModuleInit {
   ): Promise<void> {
     // ws:// → http://, wss:// → https://，用 HTTP 做健康检查
     const httpBase = url.replace(/\/+$/, "").replace(/^ws(s?):\/\//, "http$1://");
-    const healthUrl = `${httpBase}/api/health`;
+    const healthUrl = `${httpBase}/health`;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
 

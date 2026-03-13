@@ -8,8 +8,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get("status")
-  async status() {
-    return this.authService.getStatus();
+  @UseGuards(JwtAuthGuard)
+  async status(@Request() req: { user: { gatewayId: string } }) {
+    return this.authService.getStatus(req.user.gatewayId);
   }
 
   @Post("connect")

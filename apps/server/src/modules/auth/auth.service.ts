@@ -14,8 +14,8 @@ export class AuthService {
     private gatewayService: GatewayService,
   ) {}
 
-  async getStatus() {
-    const gateway = await this.prisma.gateway.findFirst();
+  async getStatus(gatewayId: string) {
+    const gateway = await this.prisma.gateway.findUnique({ where: { id: gatewayId } });
     return { connected: !!gateway, gatewayId: gateway?.id ?? null };
   }
 
