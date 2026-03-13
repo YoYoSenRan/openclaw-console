@@ -1,27 +1,26 @@
 import { create } from "zustand";
-import type { UserInfo } from "@openclaw/shared";
-import { TOKEN_KEY, REFRESH_TOKEN_KEY } from "@openclaw/shared";
+import { TOKEN_KEY, GATEWAY_ID_KEY } from "@openclaw/shared";
 
 interface AuthState {
-  user: UserInfo | null;
+  gatewayId: string | null;
   isAuthenticated: boolean;
-  setAuth: (user: UserInfo, accessToken: string, refreshToken: string) => void;
+  setAuth: (accessToken: string, gatewayId: string) => void;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
+  gatewayId: localStorage.getItem(GATEWAY_ID_KEY),
   isAuthenticated: !!localStorage.getItem(TOKEN_KEY),
 
-  setAuth: (user, accessToken, refreshToken) => {
+  setAuth: (accessToken, gatewayId) => {
     localStorage.setItem(TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-    set({ user, isAuthenticated: true });
+    localStorage.setItem(GATEWAY_ID_KEY, gatewayId);
+    set({ gatewayId, isAuthenticated: true });
   },
 
   logout: () => {
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    set({ user: null, isAuthenticated: false });
+    localStorage.removeItem(GATEWAY_ID_KEY);
+    set({ gatewayId: null, isAuthenticated: false });
   },
 }));

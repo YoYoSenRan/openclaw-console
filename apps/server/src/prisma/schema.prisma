@@ -68,9 +68,9 @@ model Skill {
 model Gateway {
   id            String        @id @default(uuid())
   name          String
-  endpoint      String
-  authType      String
-  credential    String
+  url           String
+  token         String?
+  password      String?
   status        GatewayStatus @default(DISCONNECTED)
   lastHeartbeat DateTime?
   config        Json          @default("{}")

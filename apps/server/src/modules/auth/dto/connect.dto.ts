@@ -1,15 +1,18 @@
-import { IsString, IsIn } from "class-validator";
+import { IsString, IsOptional, ValidateIf } from "class-validator";
 
 export class ConnectGatewayDto {
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @IsString()
-  endpoint: string;
+  url: string;
 
-  @IsIn(["token", "password"])
-  authType: string;
-
+  @IsOptional()
   @IsString()
-  credential: string;
+  token?: string;
+
+  @ValidateIf((o) => !o.token)
+  @IsString()
+  password?: string;
 }

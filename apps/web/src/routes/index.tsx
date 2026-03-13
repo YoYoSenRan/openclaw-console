@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router";
 import { DashboardLayout } from "@/layouts/dashboard-layout";
+import { ProtectedRoute } from "@/components/protected-route";
 import LoginPage from "@/pages/login/LoginPage";
 import DashboardPage from "@/pages/dashboard/DashboardPage";
 import AgentsPage from "@/pages/agents/AgentsPage";
@@ -11,13 +12,15 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route element={<DashboardLayout />}>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/agents" element={<AgentsPage />} />
-        <Route path="/sessions" element={<SessionsPage />} />
-        <Route path="/skills" element={<SkillsPage />} />
-        <Route path="/gateway" element={<GatewayPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/agents" element={<AgentsPage />} />
+          <Route path="/sessions" element={<SessionsPage />} />
+          <Route path="/skills" element={<SkillsPage />} />
+          <Route path="/gateway" element={<GatewayPage />} />
+        </Route>
       </Route>
     </Routes>
   );

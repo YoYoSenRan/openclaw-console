@@ -6,4 +6,4 @@ export const PAGINATION_DEFAULT = {
 } as const;
 
 export const TOKEN_KEY = "openclaw_access_token";
-export const REFRESH_TOKEN_KEY = "openclaw_refresh_token";
+export const GATEWAY_ID_KEY = "openclaw_gateway_id";

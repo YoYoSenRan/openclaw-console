@@ -14,7 +14,7 @@ import { GatewayModule } from "../gateway/gateway.module";
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.get("JWT_SECRET", "default-secret"),
-        signOptions: { expiresIn: "24h" },
+        signOptions: { expiresIn: config.get("JWT_EXPIRES_IN", "7d") },
       }),
     }),
     GatewayModule,

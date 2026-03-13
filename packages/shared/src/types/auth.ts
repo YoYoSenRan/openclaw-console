@@ -1,32 +1,20 @@
-export interface LoginRequest {
-  email: string;
-  password: string;
+export interface ConnectRequest {
+  url: string;
+  token?: string;
+  password?: string;
+  name?: string;
 }
 
-export interface LoginResponse {
+export interface ConnectResponse {
   accessToken: string;
-  refreshToken: string;
-  user: UserInfo;
+  gatewayId: string;
 }
 
-export interface RefreshTokenRequest {
-  refreshToken: string;
+export interface AuthStatusResponse {
+  connected: boolean;
+  gatewayId: string | null;
 }
 
-export interface RefreshTokenResponse {
+export interface RefreshResponse {
   accessToken: string;
-  refreshToken: string;
-}
-
-export interface UserInfo {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  createdAt: string;
-}
-
-export enum UserRole {
-  ADMIN = "ADMIN",
-  USER = "USER",
 }

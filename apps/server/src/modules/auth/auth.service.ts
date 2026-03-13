@@ -21,7 +21,7 @@ export class AuthService {
 
   async connect(dto: ConnectGatewayDto) {
     // 验证 Gateway 连接
-    await this.gatewayService.testConnection(dto.endpoint, dto.authType, dto.credential);
+    await this.gatewayService.testConnection(dto.url, dto.token, dto.password);
 
     // 清除现有 Gateway 配置（单实例模式）
     await this.prisma.gateway.deleteMany();
@@ -29,10 +29,10 @@ export class AuthService {
     // 保存新的 Gateway 配置
     const gateway = await this.prisma.gateway.create({
       data: {
-        name: dto.name,
-        endpoint: dto.endpoint,
-        authType: dto.authType,
-        credential: dto.credential,
+        name: dto.name || new URL(dto.url).host,
+        url: dto.url,
+        token: dto.token,
+        password: dto.password,
         status: "CONNECTED",
         lastHeartbeat: new Date(),
       },
@@ -69,6 +69,6 @@ export class AuthService {
   }
 
   private signToken(gatewayId: string): string {
-    return this.jwtService.sign({ gatewayId }, { expiresIn: "24h" });
+    return this.jwtService.sign({ gatewayId });
   }
 }

@@ -7,8 +7,13 @@ const envSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
   JWT_SECRET: z.string(),
+  JWT_EXPIRES_IN: z.string().default("7d"),
   SERVER_PORT: z.coerce.number().default(3000),
   CORS_ORIGIN: z.string().optional(),
+  GATEWAY_NAME: z.string().optional(),
+  GATEWAY_URL: z.string().optional(),
+  GATEWAY_TOKEN: z.string().optional(),
+  GATEWAY_PASSWORD: z.string().optional(),
 });
 
 export function validate(config: Record<string, unknown>) {

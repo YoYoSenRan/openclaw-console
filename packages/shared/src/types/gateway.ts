@@ -1,7 +1,7 @@
 export interface Gateway {
   id: string;
   name: string;
-  endpoint: string;
+  url: string;
   status: GatewayStatus;
   lastHeartbeat: string | null;
   config: Record<string, unknown>;
@@ -17,12 +17,12 @@ export enum GatewayStatus {
 
 export interface CreateGatewayRequest {
   name: string;
-  endpoint: string;
+  url: string;
   config?: Record<string, unknown>;
 }
 
 export interface UpdateGatewayRequest {
   name?: string;
-  endpoint?: string;
+  url?: string;
   config?: Record<string, unknown>;
 }
