@@ -2,9 +2,9 @@ import { Injectable } from "@nestjs/common";
 import fs from "node:fs";
 import path from "node:path";
 import { LocalSession } from "@prisma/client";
-import { PrismaService } from "../../prisma/prisma.service";
-import { BaseService } from "../base/base.service";
-import { resolveClaudeHome } from "./discovery.utils";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { BaseService } from "../../base/base.service";
+import { resolveClaudeHome } from "../../../utils/path";
 
 interface ClaudeMessage {
   type: "user" | "assistant";
@@ -69,7 +69,7 @@ export class ClaudeSessionsService extends BaseService<LocalSession> {
   }
 
   scan(): SessionStats[] {
-    const projectsDir = resolveHome(".claude", "projects");
+    const projectsDir = path.join(resolveClaudeHome(), "projects");
     if (!fs.existsSync(projectsDir)) return [];
 
     const results: SessionStats[] = [];
@@ -128,7 +128,7 @@ export class ClaudeSessionsService extends BaseService<LocalSession> {
   }
 
   readTranscript(sessionId: string, limit = 40): TranscriptMessage[] {
-    const projectsDir = resolveHome(".claude", "projects");
+    const projectsDir = path.join(resolveClaudeHome(), "projects");
     if (!fs.existsSync(projectsDir)) return [];
 
     for (const projectSlug of fs.readdirSync(projectsDir)) {

@@ -2,7 +2,8 @@ import { Injectable } from "@nestjs/common";
 import fs from "node:fs";
 import path from "node:path";
 import type { DiscoverOpenClawResult } from "@openclaw/shared";
-import { isDocker, resolveHome } from "./discovery.utils";
+import { detectPlatform } from "../../../utils/platform";
+import { resolveHome } from "../../../utils/path";
 
 @Injectable()
 export class OpenclawService {
@@ -17,7 +18,7 @@ export class OpenclawService {
   }
 
   discoverLocal(): DiscoverOpenClawResult {
-    if (isDocker()) {
+    if (detectPlatform() === "docker") {
       return { status: "not_found", reason: "docker_env" };
     }
 

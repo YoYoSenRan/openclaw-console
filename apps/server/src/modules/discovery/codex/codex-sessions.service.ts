@@ -2,9 +2,9 @@ import { Injectable } from "@nestjs/common";
 import fs from "node:fs";
 import path from "node:path";
 import { LocalSession } from "@prisma/client";
-import { PrismaService } from "../../prisma/prisma.service";
-import { BaseService } from "../base/base.service";
-import { resolveCodexHome } from "./discovery.utils";
+import { PrismaService } from "../../../prisma/prisma.service";
+import { BaseService } from "../../base/base.service";
+import { resolveCodexHome } from "../../../utils/path";
 
 interface CodexSessionMeta {
   type: "session_meta";
@@ -84,7 +84,7 @@ export class CodexSessionsService extends BaseService<LocalSession> {
   }
 
   scan(): CodexSessionStats[] {
-    const sessionsDir = resolveHome(".codex", "sessions");
+    const sessionsDir = path.join(resolveCodexHome(), "sessions");
     if (!fs.existsSync(sessionsDir)) return [];
 
     const results: CodexSessionStats[] = [];
@@ -133,7 +133,7 @@ export class CodexSessionsService extends BaseService<LocalSession> {
   }
 
   readTranscript(sessionId: string, limit = 40): TranscriptMessage[] {
-    const sessionsDir = resolveHome(".codex", "sessions");
+    const sessionsDir = path.join(resolveCodexHome(), "sessions");
     if (!fs.existsSync(sessionsDir)) return [];
 
     const found = this.findFile(sessionsDir, sessionId);
