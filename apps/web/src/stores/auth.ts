@@ -9,7 +9,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  gatewayId: localStorage.getItem(GATEWAY_ID_KEY),
+  gatewayId: localStorage.getItem(GATEWAY_ID_KEY) || null,
   isAuthenticated: !!localStorage.getItem(TOKEN_KEY),
 
   setAuth: (accessToken, gatewayId) => {

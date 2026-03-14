@@ -7,12 +7,12 @@ export interface ConnectRequest {
 
 export interface ConnectResponse {
   accessToken: string;
-  gatewayId: string;
+  gatewayId: number;
 }
 
 export interface AuthStatusResponse {
   connected: boolean;
-  gatewayId: string | null;
+  gatewayId: number | null;
 }
 
 export interface RefreshResponse {

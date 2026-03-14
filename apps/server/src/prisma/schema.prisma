@@ -31,8 +31,8 @@ model Agent {
   description String      @default("")
   status      AgentStatus @default(ACTIVE)
   config      Json        @default("{}")
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
 
   sessions Session[]
 
@@ -41,11 +41,11 @@ model Agent {
 
 model Session {
   id        String        @id @default(uuid())
-  agentId   String
+  agentId   String        @map("agent_id")
   status    SessionStatus @default(ACTIVE)
   metadata  Json          @default("{}")
-  startedAt DateTime      @default(now())
-  endedAt   DateTime?
+  startedAt DateTime      @default(now()) @map("started_at")
+  endedAt   DateTime?     @map("ended_at")
 
   agent Agent @relation(fields: [agentId], references: [id])
 
@@ -59,8 +59,8 @@ model Skill {
   version     String
   enabled     Boolean  @default(true)
   config      Json     @default("{}")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("skills")
 }
@@ -72,10 +72,33 @@ model Gateway {
   token         String?
   password      String?
   status        GatewayStatus @default(DISCONNECTED)
-  lastHeartbeat DateTime?
+  lastHeartbeat DateTime?     @map("last_heartbeat")
   config        Json          @default("{}")
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
   @@map("gateways")
+}
+
+model LocalSession {
+  id                String    @id
+  source            String
+  projectSlug       String    @map("project_slug")
+  projectPath       String?   @map("project_path")
+  model             String?
+  gitBranch         String?   @map("git_branch")
+  userMessages      Int       @default(0) @map("user_messages")
+  assistantMessages Int       @default(0) @map("assistant_messages")
+  toolUses          Int       @default(0) @map("tool_uses")
+  inputTokens       Int       @default(0) @map("input_tokens")
+  outputTokens      Int       @default(0) @map("output_tokens")
+  estimatedCost     Float     @default(0) @map("estimated_cost")
+  firstMessageAt    DateTime? @map("first_message_at")
+  lastMessageAt     DateTime? @map("last_message_at")
+  lastUserPrompt    String?   @map("last_user_prompt")
+  isActive          Boolean   @default(false) @map("is_active")
+  scannedAt         DateTime  @default(now()) @map("scanned_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@map("local_sessions")
 }

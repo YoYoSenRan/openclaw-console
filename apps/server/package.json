@@ -12,7 +12,9 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "db:push": "./prisma-env.sh prisma db push --schema=src/prisma/schema.prisma",
+    "db:migrate": "./prisma-env.sh prisma migrate dev --schema=src/prisma/schema.prisma",
+    "db:migrate:deploy": "./prisma-env.sh prisma migrate deploy --schema=src/prisma/schema.prisma",
+    "db:reset": "./prisma-env.sh prisma migrate reset --schema=src/prisma/schema.prisma",
     "db:studio": "./prisma-env.sh prisma studio --schema=src/prisma/schema.prisma",
     "db:generate": "./prisma-env.sh prisma generate --schema=src/prisma/schema.prisma"
   },
@@ -46,6 +48,7 @@
     "@types/passport-jwt": "^4.0.0",
     "@vitest/coverage-v8": "^4.1.0",
     "prisma": "^6.4.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.7.0",
     "unplugin-swc": "^1.5.9",
     "vitest": "^4.1.0"

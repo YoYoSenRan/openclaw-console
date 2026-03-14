@@ -1,5 +1,5 @@
 export interface Gateway {
-  id: string;
+  id: number;
   name: string;
   url: string;
   status: GatewayStatus;

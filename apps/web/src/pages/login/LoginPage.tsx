@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/stores/auth";
 import api from "@/lib/api";
-import type { ConnectResponse } from "@openclaw/shared";
+import type { ConnectResponse, DiscoverOpenClawResult } from "@openclaw/shared";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 
@@ -17,6 +17,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [discovering, setDiscovering] = useState(false);
+  const [discoverResult, setDiscoverResult] = useState<DiscoverOpenClawResult | null>(null);
 
   const canSubmit = url && (token || password);
 
@@ -40,6 +43,24 @@ export default function LoginPage() {
     }
   };
 
+  const handleDiscover = async () => {
+    setDiscovering(true);
+    setDiscoverResult(null);
+    try {
+      const { data } = await api.get<DiscoverOpenClawResult>("/discovery/openclaw");
+      setDiscoverResult(data);
+      if (data.status === "found") {
+        if (data.url) setUrl(data.url);
+        if (data.token) setToken(data.token);
+        if (data.password) setPassword(data.password);
+      }
+    } catch {
+      setDiscoverResult({ status: "not_found", reason: "config_missing" });
+    } finally {
+      setDiscovering(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="absolute top-4 right-4 flex items-center gap-1">
@@ -51,6 +72,33 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold">{t("login.title")}</h1>
           <p className="text-muted-foreground text-sm mt-1">{t("login.subtitle")}</p>
         </div>
+
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={handleDiscover}
+            disabled={discovering}
+            className="w-full py-2 px-4 border border-input rounded-md text-sm font-medium hover:bg-accent disabled:opacity-50 transition-colors"
+          >
+            {discovering ? t("login.discovering") : t("login.discover")}
+          </button>
+          {discoverResult && (
+            <div
+              className={`text-xs p-2 rounded-md ${
+                discoverResult.status === "found"
+                  ? "bg-green-500/10 text-green-700 dark:text-green-400"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {discoverResult.status === "found"
+                ? t("login.discoverFound")
+                : discoverResult.reason === "docker_env"
+                  ? t("login.discoverDocker")
+                  : t("login.discoverNotFound")}
+            </div>
+          )}
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>
