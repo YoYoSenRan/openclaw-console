@@ -26,9 +26,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       message = typeof res === "string" ? res : ((res as any).message ?? exception.message);
       if (Array.isArray(message)) message = message.join("; ");
     } else {
+      console.error("[UnhandledException]", exception);
       httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
       bizCode = BizCode.INTERNAL_ERROR;
-      message = "Internal server error";
+      message = exception instanceof Error ? exception.message : "Internal server error";
     }
 
     response.status(httpStatus).json({

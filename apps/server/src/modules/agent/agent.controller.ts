@@ -15,7 +15,7 @@ export class AgentController extends BaseController {
   }
 
   @Post("list")
-  list(@Body() body: Record<string, unknown>) {
+  list(@Body() body: Record<string, unknown> = {}) {
     const where = this.parseWhere(body);
     return this.service.list(where);
   }
@@ -39,11 +39,6 @@ export class AgentController extends BaseController {
   @Post("remove")
   remove(@Body("id") id: string) {
     return this.service.remove(id);
-  }
-
-  @Post("scan")
-  scan() {
-    return this.service.scan();
   }
 
   @Post("sync")
