@@ -7,11 +7,14 @@
   },
   "rules": {
     "no-unused-vars": "warn",
-    "no-console": "warn",
+    "no-console": "off",
     "eqeqeq": "error",
     "react/react-in-jsx-scope": "off",
     "import/no-unassigned-import": "off",
-    "typescript/no-extraneous-class": "off"
+    "typescript/no-extraneous-class": "off",
+    "import/no-named-as-default-member": "off",
+    "typescript/consistent-type-imports": "error",
+    "import/consistent-type-specifier-style": ["error", "prefer-top-level"]
   },
   "overrides": [
     {

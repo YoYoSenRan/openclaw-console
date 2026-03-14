@@ -1,12 +1,21 @@
+import type { DiscoverOpenClawResult } from "@openclaw/shared";
+
 import { Injectable } from "@nestjs/common";
 import fs from "node:fs";
 import path from "node:path";
-import type { DiscoverOpenClawResult } from "@openclaw/shared";
 import { detectPlatform } from "../../../utils/platform";
 import { resolveHome } from "../../../utils/path";
 
+/**
+ * Openclaw 本地配置发现服务
+ * 负责扫描本地 Openclaw 配置文件
+ */
 @Injectable()
 export class OpenclawService {
+  /**
+   * 解析配置文件路径
+   * 优先级：OPENCLAW_CONFIG_PATH > OPENCLAW_STATE_DIR > ~/.openclaw/openclaw.json
+   */
   private resolveConfigPath(): string {
     if (process.env.OPENCLAW_CONFIG_PATH) {
       return process.env.OPENCLAW_CONFIG_PATH;
@@ -17,6 +26,10 @@ export class OpenclawService {
     return resolveHome(".openclaw", "openclaw.json");
   }
 
+  /**
+   * 发现本地 Openclaw 配置
+   * 检测配置文件是否存在并解析其中的连接信息
+   */
   discoverLocal(): DiscoverOpenClawResult {
     if (detectPlatform() === "docker") {
       return { status: "not_found", reason: "docker_env" };

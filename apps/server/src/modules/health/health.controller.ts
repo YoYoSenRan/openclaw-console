@@ -1,6 +1,8 @@
+import type { HealthCheckService } from "@nestjs/terminus";
+import type { PrismaHealthIndicator } from "./database.health";
+
 import { Controller, Get } from "@nestjs/common";
-import { HealthCheck, HealthCheckService } from "@nestjs/terminus";
-import { PrismaHealthIndicator } from "./database.health";
+import { HealthCheck } from "@nestjs/terminus";
 
 @Controller("health")
 export class HealthController {

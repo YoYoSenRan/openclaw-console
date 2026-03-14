@@ -1,4 +1,4 @@
-import { PrismaService } from "../../prisma/prisma.service";
+import type { PrismaService } from "../../prisma/prisma.service";
 
 export interface PageResult<T> {
   list: T[];

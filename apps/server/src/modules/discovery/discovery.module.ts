@@ -6,6 +6,11 @@ import { OpenclawService } from "./openclaw/openclaw.service";
 import { ClaudeSessionsService } from "./claude/claude-sessions.service";
 import { CodexSessionsService } from "./codex/codex-sessions.service";
 
+/**
+ * 发现模块
+ * 整合 OpenCLA、Claude 和 Codex 会话发现功能
+ * 提供控制器和服务提供者配置
+ */
 @Module({
   controllers: [OpenclawController, ClaudeSessionsController, CodexSessionsController],
   providers: [OpenclawService, ClaudeSessionsService, CodexSessionsService],

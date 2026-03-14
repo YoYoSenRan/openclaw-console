@@ -1,6 +1,7 @@
+import type { GatewayService } from "./gateway.service";
+
 import { Controller, Get, UseGuards, Request } from "@nestjs/common";
 import { JwtAuthGuard } from "../../common/guards/auth.guard";
-import { GatewayService } from "./gateway.service";
 
 @Controller("gateway")
 @UseGuards(JwtAuthGuard)

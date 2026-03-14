@@ -1,6 +1,7 @@
+import type { AuthService } from "./auth.service";
+import type { ConnectGatewayDto } from "./dto/connect.dto";
+
 import { Controller, Get, Post, Body, UseGuards, Request } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { ConnectGatewayDto } from "./dto/connect.dto";
 import { JwtAuthGuard } from "../../common/guards/auth.guard";
 
 @Controller("auth")

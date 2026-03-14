@@ -1,8 +1,9 @@
+import type { JwtService } from "@nestjs/jwt";
+import type { PrismaService } from "../../prisma/prisma.service";
+import type { GatewayService } from "../gateway/gateway.service";
+import type { ConnectGatewayDto } from "./dto/connect.dto";
+
 import { Injectable } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { PrismaService } from "../../prisma/prisma.service";
-import { GatewayService } from "../gateway/gateway.service";
-import { ConnectGatewayDto } from "./dto/connect.dto";
 import { BizException } from "../../common/exceptions/biz.exception";
 import { BizCode } from "../../common/constants/codes";
 

@@ -1,11 +1,13 @@
+import type { LocalSession } from "@prisma/client";
 import { Injectable } from "@nestjs/common";
 import fs from "node:fs";
 import path from "node:path";
-import { LocalSession } from "@prisma/client";
-import { PrismaService } from "../../../prisma/prisma.service";
 import { BaseService } from "../../base/base.service";
 import { resolveClaudeHome } from "../../../utils/path";
 
+/**
+ * Claude 消息日志解析接口
+ */
 interface ClaudeMessage {
   type: "user" | "assistant";
   sessionId: string;
@@ -23,6 +25,9 @@ interface ClaudeMessage {
   isSidechain?: boolean;
 }
 
+/**
+ * Claude 会话统计信息
+ */
 export interface SessionStats {
   sessionId: string;
   projectSlug: string;
@@ -41,6 +46,9 @@ export interface SessionStats {
   isActive: boolean;
 }
 
+/**
+ * 对话消息记录
+ */
 export interface TranscriptMessage {
   type: "user" | "assistant";
   timestamp: string | null;
@@ -48,26 +56,36 @@ export interface TranscriptMessage {
   model?: string;
 }
 
+/**
+ * 同步结果
+ */
 export interface SyncResult {
   upserted: number;
   skipped: number;
 }
 
+/**
+ * 同步节流时间间隔（毫秒）
+ */
 const THROTTLE_MS = 30_000;
 
+/**
+ * Claude 会话发现服务
+ * 负责扫描、解析、同步 Claude Code 本地会话数据
+ */
 @Injectable()
 export class ClaudeSessionsService extends BaseService<LocalSession> {
   private lastSyncAt = 0;
   private lastResult: SyncResult | null = null;
 
-  constructor(prisma: PrismaService) {
-    super(prisma);
-  }
-
   protected get delegate() {
     return this.prisma.localSession;
   }
 
+  /**
+   * 扫描本地 Claude 会话
+   * 读取 ~/.claude/projects 目录下的 jsonl 文件并解析会话统计
+   */
   scan(): SessionStats[] {
     const projectsDir = path.join(resolveClaudeHome(), "projects");
     if (!fs.existsSync(projectsDir)) return [];
@@ -87,6 +105,10 @@ export class ClaudeSessionsService extends BaseService<LocalSession> {
     return results;
   }
 
+  /**
+   * 同步会话到数据库
+   * 将扫描到的会话数据持久化，支持强制刷新
+   */
   async sync(force = false): Promise<SyncResult> {
     const now = Date.now();
     if (!force && this.lastResult && now - this.lastSyncAt < THROTTLE_MS) {
@@ -127,6 +149,11 @@ export class ClaudeSessionsService extends BaseService<LocalSession> {
     return this.lastResult;
   }
 
+  /**
+   * 读取会话对话记录
+   * @param sessionId - 会话 ID
+   * @param limit - 返回最近的消息数量，默认 40 条
+   */
   readTranscript(sessionId: string, limit = 40): TranscriptMessage[] {
     const projectsDir = path.join(resolveClaudeHome(), "projects");
     if (!fs.existsSync(projectsDir)) return [];
@@ -140,6 +167,9 @@ export class ClaudeSessionsService extends BaseService<LocalSession> {
     return [];
   }
 
+  /**
+   * 解析 jsonl 文件获取会话统计
+   */
   private parseJsonl(filePath: string, projectSlug: string): SessionStats | null {
     const lines = fs.readFileSync(filePath, "utf-8").split("\n").filter(Boolean);
     if (lines.length === 0) return null;
@@ -223,6 +253,9 @@ export class ClaudeSessionsService extends BaseService<LocalSession> {
     };
   }
 
+  /**
+   * 解析 jsonl 文件获取对话记录
+   */
   private parseTranscript(filePath: string, limit: number): TranscriptMessage[] {
     const lines = fs.readFileSync(filePath, "utf-8").split("\n").filter(Boolean);
     const messages: TranscriptMessage[] = [];
@@ -251,6 +284,9 @@ export class ClaudeSessionsService extends BaseService<LocalSession> {
   }
 }
 
+/**
+ * 从消息内容中提取纯文本
+ */
 function extractText(content: unknown): string | null {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) {

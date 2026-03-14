@@ -1,5 +1,7 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from "@nestjs/common";
-import { Observable } from "rxjs";
+import type { NestInterceptor, ExecutionContext, CallHandler } from "@nestjs/common";
+import type { Observable } from "rxjs";
+
+import { Injectable } from "@nestjs/common";
 import { map } from "rxjs/operators";
 import { BizCode } from "../constants/codes";
 

@@ -1,6 +1,7 @@
+import type { PrismaService } from "../../prisma/prisma.service";
+import type { CreateSessionDto } from "./dto/create.dto";
+
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
-import { CreateSessionDto } from "./dto/create.dto";
 
 @Injectable()
 export class SessionService {

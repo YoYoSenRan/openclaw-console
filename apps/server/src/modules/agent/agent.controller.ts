@@ -1,8 +1,8 @@
+import type { AgentService } from "./agent.service";
+import type { CreateAgentDto } from "./dto/create.dto";
+import type { UpdateAgentDto } from "./dto/update.dto";
 import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../common/guards/auth.guard";
-import { AgentService } from "./agent.service";
-import { CreateAgentDto } from "./dto/create.dto";
-import { UpdateAgentDto } from "./dto/update.dto";
 
 @Controller("agents")
 @UseGuards(JwtAuthGuard)

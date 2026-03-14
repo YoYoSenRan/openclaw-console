@@ -1,5 +1,6 @@
+import type { BizCodeValue } from "../constants/codes";
+
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { BizCodeValue } from "../constants/codes";
 
 export class BizException extends HttpException {
   public readonly bizCode: number;

@@ -1,11 +1,14 @@
+import type { LocalSession } from "@prisma/client";
 import { Injectable } from "@nestjs/common";
 import fs from "node:fs";
 import path from "node:path";
-import { LocalSession } from "@prisma/client";
-import { PrismaService } from "../../../prisma/prisma.service";
 import { BaseService } from "../../base/base.service";
 import { resolveCodexHome } from "../../../utils/path";
 
+/**
+ * Codex 会话元数据
+ * 包含会话ID、项目路径、模型和Git分支信息
+ */
 interface CodexSessionMeta {
   type: "session_meta";
   timestamp: string;
@@ -17,6 +20,10 @@ interface CodexSessionMeta {
   };
 }
 
+/**
+ * Codex 响应条目
+ * 包含用户/助手消息、工具调用和使用统计
+ */
 interface CodexResponseItem {
   type: "response_item";
   timestamp: string;
@@ -31,14 +38,25 @@ interface CodexResponseItem {
   };
 }
 
+/**
+ * Codex 事件消息
+ * 通用的事件消息类型
+ */
 interface CodexEventMsg {
   type: "event_msg";
   timestamp: string;
   payload: unknown;
 }
 
+/**
+ * Codex JSONL 行数据的联合类型
+ */
 type CodexLine = CodexSessionMeta | CodexResponseItem | CodexEventMsg;
 
+/**
+ * Codex 会话统计数据
+ * 从本地会话文件解析得出的结构化会话信息
+ */
 export interface CodexSessionStats {
   sessionId: string;
   projectSlug: string;
@@ -57,32 +75,52 @@ export interface CodexSessionStats {
   isActive: boolean;
 }
 
+/**
+ * 转录消息
+ * 从会话文件中提取的对话消息
+ */
 export interface TranscriptMessage {
   type: string;
   timestamp: string | null;
   content: unknown;
 }
 
+/**
+ * 同步结果
+ * 包含插入/更新和跳过的记录数
+ */
 export interface SyncResult {
   upserted: number;
   skipped: number;
 }
 
+/**
+ * 同步节流时间间隔（毫秒）
+ * 防止频繁同步操作
+ */
 const THROTTLE_MS = 30_000;
 
+/**
+ * Codex 会话发现服务
+ * 负责扫描、解析、同步 Codex 本地会话数据
+ */
 @Injectable()
 export class CodexSessionsService extends BaseService<LocalSession> {
   private lastSyncAt = 0;
   private lastResult: SyncResult | null = null;
 
-  constructor(prisma: PrismaService) {
-    super(prisma);
-  }
-
+  /**
+   * 获取数据库代理对象
+   */
   protected get delegate() {
     return this.prisma.localSession;
   }
 
+  /**
+   * 扫描本地 Codex 会话
+   * 读取 ~/.codex/sessions 目录下的 jsonl 文件并解析会话统计
+   * @returns Codex 会话统计数组
+   */
   scan(): CodexSessionStats[] {
     const sessionsDir = path.join(resolveCodexHome(), "sessions");
     if (!fs.existsSync(sessionsDir)) return [];
@@ -92,6 +130,12 @@ export class CodexSessionsService extends BaseService<LocalSession> {
     return results;
   }
 
+  /**
+   * 同步会话数据到数据库
+   * 支持节流机制，避免频繁同步
+   * @param force 是否强制同步（忽略节流）
+   * @returns 同步结果
+   */
   async sync(force = false): Promise<SyncResult> {
     const now = Date.now();
     if (!force && this.lastResult && now - this.lastSyncAt < THROTTLE_MS) {
@@ -132,6 +176,13 @@ export class CodexSessionsService extends BaseService<LocalSession> {
     return this.lastResult;
   }
 
+  /**
+   * 读取会话转录内容
+   * 从指定的会话文件中提取对话消息
+   * @param sessionId 会话ID
+   * @param limit 返回消息数量限制，默认40条
+   * @returns 转录消息数组
+   */
   readTranscript(sessionId: string, limit = 40): TranscriptMessage[] {
     const sessionsDir = path.join(resolveCodexHome(), "sessions");
     if (!fs.existsSync(sessionsDir)) return [];
@@ -141,6 +192,12 @@ export class CodexSessionsService extends BaseService<LocalSession> {
     return this.parseTranscript(found, limit);
   }
 
+  /**
+   * 递归遍历目录
+   * 查找所有 jsonl 文件并解析会话统计
+   * @param dir 目录路径
+   * @param results 结果数组
+   */
   private walkDir(dir: string, results: CodexSessionStats[]) {
     for (const entry of fs.readdirSync(dir)) {
       const full = path.join(dir, entry);
@@ -153,6 +210,12 @@ export class CodexSessionsService extends BaseService<LocalSession> {
     }
   }
 
+  /**
+   * 解析 JSONL 文件
+   * 提取会话元数据、消息统计和 token 使用情况
+   * @param filePath JSONL 文件路径
+   * @returns 解析后的会话统计，如果解析失败返回 null
+   */
   private parseJsonl(filePath: string): CodexSessionStats | null {
     const lines = fs.readFileSync(filePath, "utf-8").split("\n").filter(Boolean);
     if (lines.length === 0) return null;
@@ -232,6 +295,12 @@ export class CodexSessionsService extends BaseService<LocalSession> {
     };
   }
 
+  /**
+   * 递归查找会话文件
+   * @param dir 搜索目录
+   * @param sessionId 会话ID
+   * @returns 文件路径，如果未找到返回 null
+   */
   private findFile(dir: string, sessionId: string): string | null {
     for (const entry of fs.readdirSync(dir)) {
       const full = path.join(dir, entry);
@@ -245,6 +314,13 @@ export class CodexSessionsService extends BaseService<LocalSession> {
     return null;
   }
 
+  /**
+   * 解析转录文件
+   * 提取对话消息（用户和助手）
+   * @param filePath 文件路径
+   * @param limit 返回消息数量限制
+   * @returns 转录消息数组
+   */
   private parseTranscript(filePath: string, limit: number): TranscriptMessage[] {
     const lines = fs.readFileSync(filePath, "utf-8").split("\n").filter(Boolean);
     const messages: TranscriptMessage[] = [];
@@ -271,6 +347,12 @@ export class CodexSessionsService extends BaseService<LocalSession> {
   }
 }
 
+/**
+ * 从消息内容中提取纯文本
+ * 支持字符串和块结构（text/text 类型）
+ * @param content 消息内容
+ * @returns 提取的文本，如果无法提取返回 null
+ */
 function extractText(content: unknown): string | null {
   if (typeof content === "string") return content;
   if (Array.isArray(content)) {
@@ -285,6 +367,12 @@ function extractText(content: unknown): string | null {
   return null;
 }
 
+/**
+ * 从路径生成项目 slug
+ * 将路径中的斜杠替换为连字符
+ * @param p 原始路径
+ * @returns 生成的 slug
+ */
 function deriveSlug(p: string): string {
   return p.replace(/\//g, "-").replace(/^-/, "");
 }
