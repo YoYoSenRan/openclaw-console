@@ -1,8 +1,12 @@
-import { IsString, IsOptional, IsObject } from "class-validator";
+import { IsString, IsOptional, IsObject, IsBoolean } from "class-validator";
 
 export class CreateAgentDto {
   @IsString()
   name: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
 
   @IsOptional()
   @IsString()
@@ -11,4 +15,12 @@ export class CreateAgentDto {
   @IsOptional()
   @IsObject()
   config?: Record<string, unknown>;
+
+  @IsOptional()
+  @IsString()
+  workspacePath?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isDefault?: boolean;
 }

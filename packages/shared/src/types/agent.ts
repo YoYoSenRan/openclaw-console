@@ -1,28 +1,27 @@
+export type AgentStatus = "offline" | "idle" | "busy" | "error";
+
 export interface Agent {
-  id: string;
+  id: number;
   name: string;
-  description: string;
+  role: string | null;
+  sessionKey: string | null;
+  soulContent: string | null;
   status: AgentStatus;
+  lastSeen: number | null;
+  lastActivity: string | null;
+  description: string | null;
+  isDefault: boolean;
+  mentionPatterns: string[];
   config: Record<string, unknown>;
+  workspaceId: number;
+  workspacePath: string | null;
+  source: string;
+  contentHash: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export enum AgentStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  ERROR = "ERROR",
-}
-
-export interface CreateAgentRequest {
-  name: string;
-  description?: string;
-  config?: Record<string, unknown>;
-}
-
-export interface UpdateAgentRequest {
-  name?: string;
-  description?: string;
-  status?: AgentStatus;
-  config?: Record<string, unknown>;
+export interface AgentSyncResult {
+  upserted: number;
+  skipped: number;
 }

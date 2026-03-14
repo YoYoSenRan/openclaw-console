@@ -8,7 +8,7 @@ import { BaseController } from "../../base/base.controller";
  * Codex 会话发现控制器
  * 提供 Codex 本地会话的扫描、同步、查询功能
  */
-@Controller("discovery/codex")
+@Controller("local/codex")
 @UseGuards(JwtAuthGuard)
 export class CodexSessionsController extends BaseController {
   constructor(private readonly service: CodexSessionsService) {

@@ -11,7 +11,7 @@ import { SessionModule } from "./modules/session/session.module";
 import { SkillModule } from "./modules/skill/skill.module";
 import { GatewayModule } from "./modules/gateway/gateway.module";
 import { HealthModule } from "./modules/health/health.module";
-import { DiscoveryModule } from "./modules/discovery/discovery.module";
+import { LocalModule } from "./modules/local/local.module";
 
 @Module({
   imports: [
@@ -30,7 +30,7 @@ import { DiscoveryModule } from "./modules/discovery/discovery.module";
     SkillModule,
     GatewayModule,
     HealthModule,
-    DiscoveryModule,
+    LocalModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

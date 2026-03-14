@@ -1,6 +1,6 @@
 import { SkillService } from "./skill.service";
-import type { CreateSkillDto } from "./dto/create.dto";
-import type { UpdateSkillDto } from "./dto/update.dto";
+import { CreateSkillDto } from "./dto/create.dto";
+import { UpdateSkillDto } from "./dto/update.dto";
 
 import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../common/guards/auth.guard";

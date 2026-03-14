@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/stores/auth";
-import api from "@/lib/api";
+import http from "@/https";
 import type { ConnectResponse } from "@openclaw/shared";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
@@ -27,7 +27,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data } = await api.post<ConnectResponse>("/auth/connect", {
+      const { data } = await http.post<ConnectResponse>("/auth/connect", {
         url,
         token: token || undefined,
         password: password || undefined,

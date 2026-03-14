@@ -8,7 +8,7 @@ import { BaseController } from "../../base/base.controller";
  * Claude 会话发现控制器
  * 提供 Claude Code 本地会话的扫描、同步、查询功能
  */
-@Controller("discovery/claude")
+@Controller("local/claude")
 @UseGuards(JwtAuthGuard)
 export class ClaudeSessionsController extends BaseController {
   constructor(private readonly service: ClaudeSessionsService) {
