@@ -1,4 +1,4 @@
-import type { SessionService } from "./session.service";
+import { SessionService } from "./session.service";
 import type { CreateSessionDto } from "./dto/create.dto";
 
 import { Controller, Get, Post, Param, Body, UseGuards } from "@nestjs/common";

@@ -1,7 +1,7 @@
-import type { PrismaService } from "../../prisma/prisma.service";
 import type { CreateSessionDto } from "./dto/create.dto";
 
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 export class SessionService {
@@ -26,7 +26,7 @@ export class SessionService {
   async create(dto: CreateSessionDto) {
     return this.prisma.session.create({
       data: {
-        agentId: dto.agentId,
+        agentId: Number(dto.agentId),
         metadata: (dto.metadata ?? {}) as any,
       },
     });

@@ -1,4 +1,4 @@
-import type { GatewayService } from "./gateway.service";
+import { GatewayService } from "./gateway.service";
 
 import { Controller, Get, UseGuards, Request } from "@nestjs/common";
 import { JwtAuthGuard } from "../../common/guards/auth.guard";

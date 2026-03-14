@@ -27,6 +27,18 @@ export class OpenclawService {
   }
 
   /**
+   * 读取完整的 openclaw.json 配置
+   * 返回 null 表示文件不存在或运行在 Docker 环境
+   */
+  readConfig(): Record<string, unknown> | null {
+    if (detectPlatform() === "docker") return null;
+    const configPath = this.resolveConfigPath();
+    if (!fs.existsSync(configPath)) return null;
+    const raw = fs.readFileSync(configPath, "utf-8");
+    return JSON.parse(raw) as Record<string, unknown>;
+  }
+
+  /**
    * 发现本地 Openclaw 配置
    * 检测配置文件是否存在并解析其中的连接信息
    */

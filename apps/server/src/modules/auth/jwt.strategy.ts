@@ -1,7 +1,6 @@
-import type { ConfigService } from "@nestjs/config";
-import type { PrismaService } from "../../prisma/prisma.service";
-
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { PrismaService } from "../../prisma/prisma.service";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import { BizException } from "../../common/exceptions/biz.exception";

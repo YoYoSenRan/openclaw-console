@@ -1,4 +1,4 @@
-import type { AgentService } from "./agent.service";
+import { AgentService } from "./agent.service";
 import type { CreateAgentDto } from "./dto/create.dto";
 import type { UpdateAgentDto } from "./dto/update.dto";
 import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common";

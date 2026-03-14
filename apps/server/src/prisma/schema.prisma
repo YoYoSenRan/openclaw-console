@@ -8,9 +8,10 @@ datasource db {
 }
 
 enum AgentStatus {
-  ACTIVE
-  INACTIVE
-  ERROR
+  offline
+  idle
+  busy
+  error
 }
 
 enum SessionStatus {
@@ -26,13 +27,24 @@ enum GatewayStatus {
 }
 
 model Agent {
-  id          String      @id @default(uuid())
-  name        String
-  description String      @default("")
-  status      AgentStatus @default(ACTIVE)
-  config      Json        @default("{}")
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
+  id              Int         @id @default(autoincrement())
+  name            String      @unique
+  role            String?
+  sessionKey      String?     @map("session_key")
+  soulContent     String?     @map("soul_content")
+  status          AgentStatus @default(offline)
+  lastSeen        Int?        @map("last_seen")
+  lastActivity    String?     @map("last_activity")
+  description     String?
+  isDefault       Boolean     @default(false) @map("is_default")
+  mentionPatterns Json        @default("[]") @map("mention_patterns")
+  config          Json        @default("{}")
+  workspaceId     Int         @default(1) @map("workspace_id")
+  workspacePath   String?     @map("workspace_path")
+  source          String      @default("manual")
+  contentHash     String?     @map("content_hash")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
 
   sessions Session[]
 
@@ -41,7 +53,7 @@ model Agent {
 
 model Session {
   id        String        @id @default(uuid())
-  agentId   String        @map("agent_id")
+  agentId   Int           @map("agent_id")
   status    SessionStatus @default(ACTIVE)
   metadata  Json          @default("{}")
   startedAt DateTime      @default(now()) @map("started_at")

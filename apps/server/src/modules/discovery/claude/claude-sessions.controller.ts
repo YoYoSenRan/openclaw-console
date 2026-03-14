@@ -1,4 +1,4 @@
-import type { ClaudeSessionsService } from "./claude-sessions.service";
+import { ClaudeSessionsService } from "./claude-sessions.service";
 
 import { Controller, Delete, Get, Post, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../../common/guards/auth.guard";

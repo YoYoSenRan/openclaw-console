@@ -23,6 +23,12 @@
         "no-unused-vars": "off",
         "typescript/no-unused-vars": "warn"
       }
+    },
+    {
+      "files": ["apps/server/src/**/*.ts"],
+      "rules": {
+        "typescript/consistent-type-imports": "off"
+      }
     }
   ]
 }

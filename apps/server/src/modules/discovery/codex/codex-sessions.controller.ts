@@ -1,4 +1,4 @@
-import type { CodexSessionsService } from "./codex-sessions.service";
+import { CodexSessionsService } from "./codex-sessions.service";
 
 import { Controller, Delete, Get, Post, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../../common/guards/auth.guard";

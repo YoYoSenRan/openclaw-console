@@ -1,4 +1,4 @@
-import type { SkillService } from "./skill.service";
+import { SkillService } from "./skill.service";
 import type { CreateSkillDto } from "./dto/create.dto";
 import type { UpdateSkillDto } from "./dto/update.dto";
 

@@ -1,8 +1,8 @@
 import type { OnModuleInit } from "@nestjs/common";
-import type { ConfigService } from "@nestjs/config";
-import type { PrismaService } from "../../prisma/prisma.service";
 
 import { Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { PrismaService } from "../../prisma/prisma.service";
 import { BizException } from "../../common/exceptions/biz.exception";
 import { BizCode } from "../../common/constants/codes";
 

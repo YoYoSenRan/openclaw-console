@@ -1,4 +1,4 @@
-import type { OpenclawService } from "./openclaw.service";
+import { OpenclawService } from "./openclaw.service";
 
 import { Controller, Get } from "@nestjs/common";
 import { BaseController } from "../../base/base.controller";
